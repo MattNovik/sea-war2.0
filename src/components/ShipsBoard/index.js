@@ -5,20 +5,56 @@ import { nanoid } from 'nanoid';
 import { ships } from '../../data/data';
 import './index.scss';
 
+const style = {
+  //position: 'absolute',
+  //border: '1px dashed gray',
+  //backgroundColor: 'white',
+  //padding: '0.5rem 1rem',
+  cursor: 'move',
+};
+
 const renderShipSquare = () => {
   let id = nanoid();
   return <SquareShip key={id} />;
 };
 
-const RenderShip = (count) => {
+export const RenderShip = ({
+  id,
+  left,
+  top,
+  position,
+  count,
+  hideSourceOnDrag,
+}) => {
   let shipSize = [];
-  let id = nanoid();
+  let idS = nanoid();
   for (let i = 0; i < count; i++) {
-    shipSize.push(renderShipSquare(id));
+    shipSize.push(renderShipSquare(idS));
   }
-  const [, drag] = useDrag(() => ({ type: 'box' }));
+
+  const [{ isDragging }, drag] = useDrag(
+    () => ({
+      type: 'box',
+      item: { id, left, top, position },
+      collect: (monitor) => ({
+        isDragging: monitor.isDragging(),
+      }),
+      //end: (monitor) => console.log(monitor),
+    }),
+    [id, left, top]
+  );
+
+  if (isDragging && hideSourceOnDrag) {
+    return <div ref={drag} />;
+  }
+
   return (
-    <div key={id} ref={drag} className={'ship ship-' + count}>
+    <div
+      ref={drag}
+      data-testid="box"
+      className={'ship ship-' + count}
+      style={{ left, top, position }}
+    >
       {shipSize}
     </div>
   );
@@ -34,9 +70,8 @@ const ShipsBoard = () => {
     }
     shipslist.push(newList);
   }
-  console.log(shipslist);
 
-  return <div className="ships-board">{RenderShip(4)}</div>;
+  return <div className="ships-board"></div>;
 };
 
 export default ShipsBoard;

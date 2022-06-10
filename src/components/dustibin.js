@@ -17,8 +17,8 @@ function getStyle(backgroundColor) {
   };
 }
 export const Dustbin = ({ greedy, children }) => {
-  const [hasDropped, setHasDropped] = useState(false);
-  const [hasDroppedOnChild, setHasDroppedOnChild] = useState(false);
+  //const [hasDropped, setHasDropped] = useState(false);
+  //const [hasDroppedOnChild, setHasDroppedOnChild] = useState(false);
   const [{ isOver, isOverCurrent }, drop] = useDrop(
     () => ({
       accept: 'box',
@@ -27,15 +27,15 @@ export const Dustbin = ({ greedy, children }) => {
         if (didDrop && !greedy) {
           return;
         }
-        setHasDropped(true);
-        setHasDroppedOnChild(didDrop);
+        //setHasDropped(true);
+        //setHasDroppedOnChild(didDrop);
       },
       collect: (monitor) => ({
         isOver: monitor.isOver(),
         isOverCurrent: monitor.isOver({ shallow: true }),
       }),
     }),
-    [greedy, setHasDropped, setHasDroppedOnChild]
+    [greedy]
   );
   const text = greedy ? 'greedy' : 'not greedy';
   let backgroundColor = 'rgba(0, 0, 0, .5)';
@@ -46,7 +46,6 @@ export const Dustbin = ({ greedy, children }) => {
     <div ref={drop} style={getStyle(backgroundColor)}>
       {text}
       <br />
-      {hasDropped && <span>dropped {hasDroppedOnChild && ' on child'}</span>}
 
       <div>{children}</div>
     </div>
