@@ -7,6 +7,8 @@ import './index.scss';
 import { RenderShip } from '../ShipsBoard';
 import { useCallback } from 'react';
 import update from 'immutability-helper';
+import { useDispatch, useSelector } from 'react-redux';
+import { moveBox } from '../../store/tableRedux/tableWorkSpace';
 
 function getStyle(backgroundColor) {
   return {
@@ -14,13 +16,11 @@ function getStyle(backgroundColor) {
   };
 }
 
-const Table = ({ uniqueKey }) => {
-  const [boxes, setBoxes] = useState({
-    a: { top: 0, left: 0, count: 4, position: 'absolute' },
-    b: { top: 0, left: 40, count: 4, position: 'absolute' },
-  });
-
-  const moveBox = useCallback(
+const Table = (hero) => {
+  const dispatch = useDispatch();
+  const tableShips = useSelector((state) => state.table.ships);
+  const tableSpace = useSelector((state) => state.table.tableSpace);
+  /*   const moveBox = useCallback(
     (id, left, top, position) => {
       setBoxes(
         update(boxes, {
@@ -31,7 +31,7 @@ const Table = ({ uniqueKey }) => {
       );
     },
     [boxes, setBoxes]
-  );
+  ); */
 
   const [, drop] = useDrop(
     () => ({
@@ -61,48 +61,50 @@ const Table = ({ uniqueKey }) => {
               : 0)
         );
         const position = 'absolute';
-        moveBox(item.id, left, top, position);
+        const newId = item.id;
+        dispatch(moveBox({ newId, left, top, position }));
         return undefined;
       },
     }),
-    [moveBox]
+    []
   );
 
-  const [bc, setBc] = useState('rgba(0, 0, 0, .5)');
-  const renderSquare = (i) => {
+  const [bc] = useState('rgba(0, 0, 0, .5)');
+  const renderSquare = (mean, i) => {
     return (
-      <div key={i} className="wrapper-square">
-        <Square />
+      <div key={i} id={i} value={mean} className="wrapper-square">
+        <Square value={mean} />
       </div>
     );
   };
 
-  /*   if (isOverCurrent || isOver) {
-    backgroundColor = 'darkgreen';
-  } */
-
   const squaresList = [];
-  for (let i = 0; i < 100; i++) {
-    squaresList.push(renderSquare(nanoid()));
+  for (let i = 0; i < tableSpace.length; i++) {
+    squaresList.push(renderSquare(tableSpace[i].mean, tableSpace[i].id));
   }
 
   return (
-    <div ref={drop} style={getStyle(bc)} className={'table ' + uniqueKey}>
+    <div ref={drop} hero style={getStyle(bc)} className={'table '}>
       {squaresList}
-      {Object.keys(boxes).map((key) => {
-        const { left, top, count, position } = boxes[key];
-        return (
-          <RenderShip
-            key={key}
-            id={key}
-            count={count}
-            left={left}
-            top={top}
-            position={position}
-            hideSourceOnDrag={true}
-          ></RenderShip>
-        );
-      })}
+
+      {hero ? (
+        Object.keys(tableShips).map((key) => {
+          const { left, top, count, position } = tableShips[key];
+          return (
+            <RenderShip
+              key={key}
+              id={key}
+              count={count}
+              left={left}
+              top={top}
+              position={position}
+              hideSourceOnDrag={true}
+            ></RenderShip>
+          );
+        })
+      ) : (
+        <></>
+      )}
     </div>
   );
 };

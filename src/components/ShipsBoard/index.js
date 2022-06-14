@@ -5,14 +5,6 @@ import { nanoid } from 'nanoid';
 import { ships } from '../../data/data';
 import './index.scss';
 
-const style = {
-  //position: 'absolute',
-  //border: '1px dashed gray',
-  //backgroundColor: 'white',
-  //padding: '0.5rem 1rem',
-  cursor: 'move',
-};
-
 const renderShipSquare = () => {
   let id = nanoid();
   return <SquareShip key={id} />;
@@ -35,11 +27,14 @@ export const RenderShip = ({
   const [{ isDragging }, drag] = useDrag(
     () => ({
       type: 'box',
-      item: { id, left, top, position },
+      item: { id, left, top, count, position },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
-      //end: (monitor) => console.log(monitor),
+      isDragging: (monitor) => {
+        console.log(monitor.getInitialClientOffset());
+      },
+      //end: (e, monitor) => console.log(monitor.getSourceClientOffset()),
     }),
     [id, left, top]
   );
